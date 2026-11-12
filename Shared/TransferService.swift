@@ -53,6 +53,8 @@ final class TransferService: NSObject, ObservableObject {
         #endif
     }
 
+    func reportStatus(_ message: String) { status = message }
+
     func stop() {
         #if os(iOS)
         browser?.stopBrowsingForPeers()
