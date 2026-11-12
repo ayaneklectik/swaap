@@ -99,7 +99,7 @@ struct IOSContentView: View {
                                 }
                                 guard let photoFileURL else {
                                     withAnimation(.spring()) { dragOffset = .zero }
-                                    transfer.status = "Choose a photo before sending"
+                                    transfer.reportStatus("Choose a photo before sending")
                                     return
                                 }
                                 let fling = CGSize(width: distance > 0 ? 520 : -520, height: value.translation.height * 0.4)
@@ -168,12 +168,13 @@ struct IOSContentView: View {
                     let directory = FileManager.default.temporaryDirectory.appendingPathComponent("SwaapOutgoing", isDirectory: true)
                     try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
                     let file = directory.appendingPathComponent("\(UUID().uuidString).jpg")
-                    try data.write(to: file, options: .atomic)
+                    let jpegData = image.jpegData(compressionQuality: 0.95) ?? data
+                    try jpegData.write(to: file, options: .atomic)
                     previewImage = image
                     photoFileURL = file
-                    transfer.status = transfer.connectedDevice == nil ? "Photo ready — waiting for your Mac" : "Photo ready — drag it to either edge"
+                    transfer.reportStatus(transfer.connectedDevice == nil ? "Photo ready — waiting for your Mac" : "Photo ready — drag it to either edge")
                 } catch {
-                    transfer.status = "Couldn't load that photo: \(error.localizedDescription)"
+                    transfer.reportStatus("Couldn't load that photo: \(error.localizedDescription)")
                 }
             }
         }
