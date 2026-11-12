@@ -1,0 +1,25 @@
+name: Build Apple apps
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install XcodeGen
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        run: xcodegen generate
+      - name: Build macOS app
+        run: xcodebuild -project Swaap.xcodeproj -scheme Swaap-Mac -destination 'generic/platform=macOS' CODE_SIGNING_ALLOWED=NO build
+      - name: Build iOS app
+        run: xcodebuild -project Swaap.xcodeproj -scheme Swaap-iOS -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
