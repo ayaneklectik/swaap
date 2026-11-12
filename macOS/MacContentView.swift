@@ -3,6 +3,8 @@ import AppKit
 
 struct MacContentView: View {
     @StateObject private var transfer = TransferService()
+    @State private var arrivalOffset: CGSize = .zero
+    @State private var arrivalScale: CGFloat = 1
 
     var body: some View {
         ZStack {
@@ -43,6 +45,8 @@ struct MacContentView: View {
                             .scaledToFit()
                             .frame(maxWidth: 300, maxHeight: 164)
                             .clipShape(RoundedRectangle(cornerRadius: 17))
+                            .offset(arrivalOffset)
+                            .scaleEffect(arrivalScale)
                     } else {
                         VStack(spacing: 13) {
                             Image(systemName: "arrow.down.to.line")
@@ -88,5 +92,14 @@ struct MacContentView: View {
         .frame(minWidth: 480, minHeight: 380)
         .preferredColorScheme(.dark)
         .onAppear { transfer.start() }
+        .onChange(of: transfer.lastReceivedFile) { _, newFile in
+            guard newFile != nil else { return }
+            arrivalOffset = CGSize(width: 250, height: -18)
+            arrivalScale = 0.72
+            withAnimation(.spring(response: 0.62, dampingFraction: 0.72)) {
+                arrivalOffset = .zero
+                arrivalScale = 1
+            }
+        }
     }
 }
